@@ -1,6 +1,7 @@
 using IMDBTop250MVC.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,13 @@ builder.Services.AddDbContext<MovieContext>(options =>
 builder.Services.AddScoped<DataSeeder>();
 
 var app = builder.Build();
+//MovieContext context = new(MovieContext);
+//await context.Database.MigrateAsync();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<MovieContext>(); dbContext.Database.Migrate();
+}
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
